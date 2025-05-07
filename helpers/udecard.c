@@ -269,7 +269,10 @@ bool udecard_gather_keys(uint8_t sector_keys[][6]) {
     if(!keys_dict_check_presence(EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH))) return false;
     KeysDict* keys_dict =
         keys_dict_alloc(EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH), KeysDictModeOpenExisting, 6);
-    if(FLIPPER_MFCLASSIC_DICT_TOTAL_KEYS != keys_dict_get_total_keys(keys_dict)) return false;
+    if(FLIPPER_MFCLASSIC_DICT_TOTAL_KEYS != keys_dict_get_total_keys(keys_dict)) {
+        keys_dict_free(keys_dict);
+        return false;
+    }
 
     int udecard_keys_indices[] = {
         UDECARD_KEYA_0_INDEX,
