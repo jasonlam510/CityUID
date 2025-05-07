@@ -269,6 +269,7 @@ bool udecard_gather_keys(uint8_t sector_keys[][6]) {
     if(!keys_dict_check_presence(EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH))) return false;
     KeysDict* keys_dict =
         keys_dict_alloc(EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH), KeysDictModeOpenExisting, 6);
+    if(!keys_dict) return false;
     if(FLIPPER_MFCLASSIC_DICT_TOTAL_KEYS != keys_dict_get_total_keys(keys_dict)) {
         keys_dict_free(keys_dict);
         return false;
@@ -297,15 +298,15 @@ bool udecard_gather_keys(uint8_t sector_keys[][6]) {
     }
 
     memcpy(sector_keys[0], gathered_keys[0], sizeof(gathered_keys[0]));
-    memcpy(sector_keys[1], gathered_keys[5], sizeof(gathered_keys[1]));
-    memcpy(sector_keys[2], gathered_keys[5], sizeof(gathered_keys[2]));
-    memcpy(sector_keys[3], gathered_keys[5], sizeof(gathered_keys[3]));
+    memcpy(sector_keys[1], gathered_keys[5], sizeof(gathered_keys[5]));
+    memcpy(sector_keys[2], gathered_keys[5], sizeof(gathered_keys[5]));
+    memcpy(sector_keys[3], gathered_keys[5], sizeof(gathered_keys[5]));
     // 4
-    memcpy(sector_keys[5], gathered_keys[1], sizeof(gathered_keys[4]));
-    memcpy(sector_keys[6], gathered_keys[2], sizeof(gathered_keys[5]));
+    memcpy(sector_keys[5], gathered_keys[1], sizeof(gathered_keys[1]));
+    memcpy(sector_keys[6], gathered_keys[2], sizeof(gathered_keys[2]));
     // 7
-    memcpy(sector_keys[8], gathered_keys[3], sizeof(gathered_keys[6]));
-    memcpy(sector_keys[9], gathered_keys[4], sizeof(gathered_keys[7]));
+    memcpy(sector_keys[8], gathered_keys[3], sizeof(gathered_keys[3]));
+    memcpy(sector_keys[9], gathered_keys[4], sizeof(gathered_keys[4]));
     // 10...15
 
     keys_dict_free(keys_dict);
