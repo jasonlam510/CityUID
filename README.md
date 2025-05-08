@@ -3,7 +3,9 @@
 Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 > [!IMPORTANT]
-> The functionality of this application is limited to reading the contents of the card.
+> For legal reasons, no keys for reading the card are included in this application.
+> Hence, your Flipper Zero has to have the usual `mf_classic_dict.nfc` installed (it probably does).
+> The functionality of this application is limited to parsing the contents of the card.
 > No modifications are possible or will be made possible in the future.
 > **[See legal information (in German)](docs/Legal.md)**
 
