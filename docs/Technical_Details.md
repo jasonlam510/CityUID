@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 > For legal reasons, no keys for reading the card are included in this application.
-> The functionality of this application is limited to reading the contents of the card.
+> The functionality of this application is limited to parsing the contents of the card.
 > No modifications are possible or will be made possible in the future.
 > **[See legal information (in German)](Legal.md)**
 
