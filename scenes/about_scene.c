@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,24 +20,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "about_scene.h"
 
-#include "udecard_app_i.h"
+#include "cityuid_app_i.h"
 
-void udecard_about_scene_on_enter(void* context) {
+void cityuid_about_scene_on_enter(void* context) {
     App* app = context;
 
     text_box_reset(app->textbox);
     text_box_set_text(app->textbox, ABOUT_TEXT);
 
-    view_dispatcher_switch_to_view(app->view_dispatcher, UDECardTextBoxView);
+    view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDTextBoxView);
 }
 
-bool udecard_about_scene_on_event(void* context, SceneManagerEvent event) {
+bool cityuid_about_scene_on_event(void* context, SceneManagerEvent event) {
     UNUSED(context);
     UNUSED(event);
     return false;
 }
 
-void udecard_about_scene_on_exit(void* context) {
+void cityuid_about_scene_on_exit(void* context) {
     App* app = context;
 
     text_box_reset(app->textbox);

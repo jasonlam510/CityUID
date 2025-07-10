@@ -9,12 +9,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build udecard-app with ufbt
+      - name: Build cityuid-app with ufbt
         uses: flipperdevices/flipperzero-ufbt-action@v0.1
         id: build-app
         with:
           sdk-channel: release
-      - name: Upload udecard-app artifacts
+      - name: Upload cityuid-app artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-${{ steps.build-app.outputs.suffix }}

@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,12 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "results_scene.h"
 
-#include "udecard_app_i.h"
+#include "cityuid_app_i.h"
 
-void udecard_results_scene_on_enter(void* context) {
+void cityuid_results_scene_on_enter(void* context) {
     App* app = context;
 
-    UDECard* udecard = app->udecard;
+    CityUID* cityuid = app->cityuid;
 
     widget_reset(app->widget);
 
@@ -36,36 +36,36 @@ void udecard_results_scene_on_enter(void* context) {
     char transaction_string[sizeof("[!?] Transactions: 00000")] = {0};
     char error_string[sizeof("(Parsing error: 000)")] = {0};
 
-    snprintf(ksnr_string, sizeof(ksnr_string), "KS-Nr. %s", udecard->ksnr);
+    snprintf(ksnr_string, sizeof(ksnr_string), "KS-Nr. %s", cityuid->ksnr);
     snprintf(
         member_type_string,
         sizeof(member_type_string),
         "Member type: %s %s",
-        UDECARD_MEMBER_TYPE_TO_STRING(udecard->member_type),
-        udecard->parsing_result & UDECardParsingResultErrorMemberType ? "[!?]" : "");
+        UDECARD_MEMBER_TYPE_TO_STRING(cityuid->member_type),
+        cityuid->parsing_result & CityUIDParsingResultErrorMemberType ? "[!?]" : "");
     snprintf(
         member_number_string,
         sizeof(member_number_string),
         "%s No.: %s %s",
-        UDECARD_MEMBER_TYPE_TO_STRING(udecard->member_type),
-        udecard->member_number,
-        udecard->parsing_result & UDECardParsingResultErrorMemberNumber ? "[!?]" : "");
+        UDECARD_MEMBER_TYPE_TO_STRING(cityuid->member_type),
+        cityuid->member_number,
+        cityuid->parsing_result & CityUIDParsingResultErrorMemberNumber ? "[!?]" : "");
     snprintf(
         balance_string,
         sizeof(balance_string),
         "Balance: %d.%02d EUR %s",
-        udecard->balance / 100,
-        udecard->balance % 100,
-        udecard->parsing_result & UDECardParsingResultErrorBalance ? "[!?]" : "");
+        cityuid->balance / 100,
+        cityuid->balance % 100,
+        cityuid->parsing_result & CityUIDParsingResultErrorBalance ? "[!?]" : "");
     snprintf(
         transaction_string,
         sizeof(transaction_string),
         "Transactions: %d %s",
-        udecard->transaction_count,
-        udecard->parsing_result & UDECardParsingResultErrorTransactionCount ? "[!?]" : "");
-    if(udecard->parsing_result != UDECardParsingResultSuccess)
+        cityuid->transaction_count,
+        cityuid->parsing_result & CityUIDParsingResultErrorTransactionCount ? "[!?]" : "");
+    if(cityuid->parsing_result != CityUIDParsingResultSuccess)
         snprintf(
-            error_string, sizeof(error_string), "(Parsing error: %03i)", udecard->parsing_result);
+            error_string, sizeof(error_string), "(Parsing error: %03i)", cityuid->parsing_result);
 
     widget_add_string_element(app->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, ksnr_string);
     widget_add_string_element(
@@ -79,19 +79,19 @@ void udecard_results_scene_on_enter(void* context) {
     widget_add_string_element(
         app->widget, 0, 51, AlignLeft, AlignTop, FontSecondary, error_string);
 
-    view_dispatcher_switch_to_view(app->view_dispatcher, UDECardWidgetView);
+    view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDWidgetView);
 }
 
-bool udecard_results_scene_on_event(void* context, SceneManagerEvent event) {
+bool cityuid_results_scene_on_event(void* context, SceneManagerEvent event) {
     App* app = context;
     bool consumed = false;
 
     switch(event.type) {
     case SceneManagerEventTypeBack:
         if(!scene_manager_search_and_switch_to_previous_scene(
-               app->scene_manager, UDECardDetectScene))
+               app->scene_manager, CityUIDDetectScene))
             scene_manager_search_and_switch_to_previous_scene(
-                app->scene_manager, UDECardLoadScene);
+                app->scene_manager, CityUIDLoadScene);
         consumed = true;
     default:
         break;
@@ -100,7 +100,7 @@ bool udecard_results_scene_on_event(void* context, SceneManagerEvent event) {
     return consumed;
 }
 
-void udecard_results_scene_on_exit(void* context) {
+void cityuid_results_scene_on_exit(void* context) {
     App* app = context;
 
     widget_reset(app->widget);

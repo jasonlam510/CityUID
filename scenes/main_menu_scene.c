@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,46 +20,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "main_menu_scene.h"
 
-#include "../udecard_app_i.h"
+#include "../cityuid_app_i.h"
 
-void udecard_main_menu_callback(void* context, uint32_t index) {
-    FURI_LOG_I("UDECard", "Main menu callback");
+void cityuid_main_menu_callback(void* context, uint32_t index) {
+    FURI_LOG_I("CityUID", "Main menu callback");
     App* app = context;
 
     switch(index) {
-    case UDECardMainMenuSceneReadEvent:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardMainMenuSceneReadEvent);
+    case CityUIDMainMenuSceneReadEvent:
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDMainMenuSceneReadEvent);
         break;
-    case UDECardMainMenuSceneLoadEvent:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardMainMenuSceneLoadEvent);
+    case CityUIDMainMenuSceneLoadEvent:
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDMainMenuSceneLoadEvent);
         break;
-    case UDECardMainMenuSceneAboutEvent:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardMainMenuSceneAboutEvent);
+    case CityUIDMainMenuSceneAboutEvent:
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDMainMenuSceneAboutEvent);
         break;
     }
 }
 
-void udecard_main_menu_scene_on_enter(void* context) {
+void cityuid_main_menu_scene_on_enter(void* context) {
     App* app = context;
 
     submenu_reset(app->submenu);
 
-    submenu_set_header(app->submenu, "UDECard");
+    submenu_set_header(app->submenu, "CityUID");
     submenu_add_item(
-        app->submenu, "Read", UDECardMainMenuSceneItemRead, udecard_main_menu_callback, app);
+        app->submenu, "Read", CityUIDMainMenuSceneItemRead, cityuid_main_menu_callback, app);
     submenu_add_item(
-        app->submenu, "Load", UDECardMainMenuSceneItemLoad, udecard_main_menu_callback, app);
+        app->submenu, "Load", CityUIDMainMenuSceneItemLoad, cityuid_main_menu_callback, app);
     submenu_add_item(
-        app->submenu, "About", UDECardMainMenuSceneItemAbout, udecard_main_menu_callback, app);
+        app->submenu, "About", CityUIDMainMenuSceneItemAbout, cityuid_main_menu_callback, app);
 
     submenu_set_selected_item(
-        app->submenu, scene_manager_get_scene_state(app->scene_manager, UDECardMainMenuScene));
+        app->submenu, scene_manager_get_scene_state(app->scene_manager, CityUIDMainMenuScene));
 
-    view_dispatcher_switch_to_view(app->view_dispatcher, UDECardSubmenuView);
+    view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDSubmenuView);
 }
 
-bool udecard_main_menu_scene_on_event(void* context, SceneManagerEvent event) {
-    FURI_LOG_I("UDECard", "Main menu event.");
+bool cityuid_main_menu_scene_on_event(void* context, SceneManagerEvent event) {
+    FURI_LOG_I("CityUID", "Main menu event.");
     App* app = context;
 
     bool consumed = false;
@@ -67,22 +67,22 @@ bool udecard_main_menu_scene_on_event(void* context, SceneManagerEvent event) {
     switch(event.type) {
     case SceneManagerEventTypeCustom:
         switch(event.event) {
-        case UDECardMainMenuSceneReadEvent:
+        case CityUIDMainMenuSceneReadEvent:
             scene_manager_set_scene_state(
-                app->scene_manager, UDECardMainMenuScene, UDECardMainMenuSceneItemRead);
-            scene_manager_next_scene(app->scene_manager, UDECardDetectScene);
+                app->scene_manager, CityUIDMainMenuScene, CityUIDMainMenuSceneItemRead);
+            scene_manager_next_scene(app->scene_manager, CityUIDDetectScene);
             consumed = true;
             break;
-        case UDECardMainMenuSceneLoadEvent:
+        case CityUIDMainMenuSceneLoadEvent:
             scene_manager_set_scene_state(
-                app->scene_manager, UDECardMainMenuScene, UDECardMainMenuSceneItemLoad);
-            scene_manager_next_scene(app->scene_manager, UDECardLoadScene);
+                app->scene_manager, CityUIDMainMenuScene, CityUIDMainMenuSceneItemLoad);
+            scene_manager_next_scene(app->scene_manager, CityUIDLoadScene);
             consumed = true;
             break;
-        case UDECardMainMenuSceneAboutEvent:
+        case CityUIDMainMenuSceneAboutEvent:
             scene_manager_set_scene_state(
-                app->scene_manager, UDECardMainMenuScene, UDECardMainMenuSceneItemAbout);
-            scene_manager_next_scene(app->scene_manager, UDECardAboutScene);
+                app->scene_manager, CityUIDMainMenuScene, CityUIDMainMenuSceneItemAbout);
+            scene_manager_next_scene(app->scene_manager, CityUIDAboutScene);
             consumed = true;
             break;
         }
@@ -94,7 +94,7 @@ bool udecard_main_menu_scene_on_event(void* context, SceneManagerEvent event) {
     return consumed;
 }
 
-void udecard_main_menu_scene_on_exit(void* context) {
+void cityuid_main_menu_scene_on_exit(void* context) {
     App* app = context;
 
     submenu_reset(app->submenu);

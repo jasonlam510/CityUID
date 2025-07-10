@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -30,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define UDECARD_UID_BLOCK (0 * BLOCKS_PER_SECTOR + 0)
 #define UDECARD_UID_SIZE  4
 
-// used to identify whether the card is a UDECard
+// used to identify whether the card is a CityUID
 #define UDECARD_CONSTANT_BLOCK1 (0 * BLOCKS_PER_SECTOR + 1)
 #define UDECARD_CONSTANT_BLOCK1_CONTENTS_BYTES \
     {0x55, 0x06, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a}
@@ -87,60 +87,60 @@ static const uint8_t UDECARD_CONSTANT_BLOCK2_CONTENTS[] = UDECARD_CONSTANT_BLOCK
 // AFAIK the University also issues cash cards (for payment only)
 // and library cards (for borrowing books).
 // Pull requests or additional information is very appreciated!
-typedef enum UDECardMemberType {
-    UDECardMemberTypeStudent,
-    UDECardMemberTypeEmployee,
-    UDECardMemberTypeUnknown,
-} UDECardMemberType;
+typedef enum CityUIDMemberType {
+    CityUIDMemberTypeStudent,
+    CityUIDMemberTypeEmployee,
+    CityUIDMemberTypeUnknown,
+} CityUIDMemberType;
 
 #define UDECARD_MEMBER_TYPE_TO_STRING(X)             \
-    ((X) == UDECardMemberTypeStudent  ? "Student" :  \
-     (X) == UDECardMemberTypeEmployee ? "Employee" : \
+    ((X) == CityUIDMemberTypeStudent  ? "Student" :  \
+     (X) == CityUIDMemberTypeEmployee ? "Employee" : \
                                         "Unknown")
 
-typedef enum UDECardLoadingResult {
-    UDECardLoadingResultSuccess,
-    UDECardLoadingResultErrorNotNFC,
-    UDECardLoadingResultErrorNotMfClassic,
-} UDECardLoadingResult;
+typedef enum CityUIDLoadingResult {
+    CityUIDLoadingResultSuccess,
+    CityUIDLoadingResultErrorNotNFC,
+    CityUIDLoadingResultErrorNotMfClassic,
+} CityUIDLoadingResult;
 
-typedef enum UDECardParsingResult {
-    UDECardParsingResultSuccess = 0,
-    UDECardParsingResultErrorMagic = 1 << 0,
-    UDECardParsingResultErrorKsnr = 1 << 1,
-    UDECardParsingResultErrorMemberType = 1 << 2,
-    UDECardParsingResultErrorBalance = 1 << 3,
-    UDECardParsingResultErrorMemberNumber = 1 << 4,
-    UDECardParsingResultErrorTransactionCount = 1 << 5
-} UDECardParsingResult;
+typedef enum CityUIDParsingResult {
+    CityUIDParsingResultSuccess = 0,
+    CityUIDParsingResultErrorMagic = 1 << 0,
+    CityUIDParsingResultErrorKsnr = 1 << 1,
+    CityUIDParsingResultErrorMemberType = 1 << 2,
+    CityUIDParsingResultErrorBalance = 1 << 3,
+    CityUIDParsingResultErrorMemberNumber = 1 << 4,
+    CityUIDParsingResultErrorTransactionCount = 1 << 5
+} CityUIDParsingResult;
 
-typedef struct UDECard {
+typedef struct CityUID {
     MfClassicData* carddata;
 
-    UDECardLoadingResult loading_result;
-    UDECardParsingResult parsing_result;
+    CityUIDLoadingResult loading_result;
+    CityUIDParsingResult parsing_result;
 
     uint8_t uid[4];
 
     char ksnr[UDECARD_KSNR_SIZE_MAX_LENGTH + 1]; // KS-Nr. (Karten-Seriennummer)
-    UDECardMemberType member_type; // Stundent or Employee
+    CityUIDMemberType member_type; // Stundent or Employee
     char member_number
         [UDECARD_MEMBER_NUMBER_SIZE +
          1]; // student number for students, employee number for employees
     uint16_t balance;
     uint16_t transaction_count;
-} UDECard;
+} CityUID;
 
-UDECard* udecard_alloc();
-void udecard_free(UDECard* udecard);
-UDECardParsingResult udecard_parse(UDECard* udecard, MfClassicData* mfclassicdata);
+CityUID* cityuid_alloc();
+void cityuid_free(CityUID* cityuid);
+CityUIDParsingResult cityuid_parse(CityUID* cityuid, MfClassicData* mfclassicdata);
 void uid_to_ksnr(char* ksnr, uint8_t* uid);
 int xor3_to_int(const uint8_t* bytes);
 
-UDECardLoadingResult udecard_load_from_nfc_device(UDECard* udecard, NfcDevice* nfc_device);
-UDECardLoadingResult udecard_load_from_path(UDECard* udecard, FuriString* path);
+CityUIDLoadingResult cityuid_load_from_nfc_device(CityUID* cityuid, NfcDevice* nfc_device);
+CityUIDLoadingResult cityuid_load_from_path(CityUID* cityuid, FuriString* path);
 
-char* udecard_loading_error_string(UDECardLoadingResult loading_result);
-bool udecard_gather_keys(uint8_t sector_keys[][6]);
+char* cityuid_loading_error_string(CityUIDLoadingResult loading_result);
+bool cityuid_gather_keys(uint8_t sector_keys[][6]);
 
 #endif

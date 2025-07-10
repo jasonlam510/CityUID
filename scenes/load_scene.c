@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,31 +20,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "load_scene.h"
 
-#include "udecard_app_i.h"
+#include "cityuid_app_i.h"
 
-bool udecard_load_scene_file_path_dialog(App* app);
+bool cityuid_load_scene_file_path_dialog(App* app);
 
-void udecard_load_scene_on_enter(void* context) {
+void cityuid_load_scene_on_enter(void* context) {
     App* app = context;
 
-    if(udecard_load_scene_file_path_dialog(app)) {
-        UDECardLoadingResult loading_result = udecard_load_from_path(app->udecard, app->file_path);
-        if(loading_result != UDECardLoadingResultSuccess) {
-            view_dispatcher_send_custom_event(app->view_dispatcher, UDECardLoadSceneFailedEvent);
+    if(cityuid_load_scene_file_path_dialog(app)) {
+        CityUIDLoadingResult loading_result = cityuid_load_from_path(app->cityuid, app->file_path);
+        if(loading_result != CityUIDLoadingResultSuccess) {
+            view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDLoadSceneFailedEvent);
             return;
         }
-        UDECardParsingResult parsing_result = udecard_parse(app->udecard, app->udecard->carddata);
-        if(parsing_result & UDECardParsingResultErrorMagic) { // other parsing errors are not fatal
-            view_dispatcher_send_custom_event(app->view_dispatcher, UDECardLoadSceneFailedEvent);
+        CityUIDParsingResult parsing_result = cityuid_parse(app->cityuid, app->cityuid->carddata);
+        if(parsing_result & CityUIDParsingResultErrorMagic) { // other parsing errors are not fatal
+            view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDLoadSceneFailedEvent);
             return;
         }
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardLoadSceneSuccessEvent);
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDLoadSceneSuccessEvent);
     } else {
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardLoadSceneCancelledEvent);
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDLoadSceneCancelledEvent);
     }
 }
 
-bool udecard_load_scene_on_event(void* context, SceneManagerEvent event) {
+bool cityuid_load_scene_on_event(void* context, SceneManagerEvent event) {
     App* app = context;
 
     bool consumed = false;
@@ -52,21 +52,21 @@ bool udecard_load_scene_on_event(void* context, SceneManagerEvent event) {
     switch(event.type) {
     case SceneManagerEventTypeCustom:
         switch(event.event) {
-        case UDECardLoadSceneSuccessEvent:
-            scene_manager_next_scene(app->scene_manager, UDECardResultsScene);
+        case CityUIDLoadSceneSuccessEvent:
+            scene_manager_next_scene(app->scene_manager, CityUIDResultsScene);
             consumed = true;
             break;
-        case UDECardLoadSceneFailedEvent:
-            if(app->udecard->loading_result != UDECardLoadingResultSuccess) {
-                udecard_app_error_dialog(
-                    app, udecard_loading_error_string(app->udecard->loading_result));
+        case CityUIDLoadSceneFailedEvent:
+            if(app->cityuid->loading_result != CityUIDLoadingResultSuccess) {
+                cityuid_app_error_dialog(
+                    app, cityuid_loading_error_string(app->cityuid->loading_result));
             } else { // parsing error
-                udecard_app_error_dialog(app, "Not a UDECard.");
+                cityuid_app_error_dialog(app, "Not a CityUID.");
             }
-            udecard_load_scene_on_enter(context); // reopen file dialog
+            cityuid_load_scene_on_enter(context); // reopen file dialog
             consumed = true;
             break;
-        case UDECardLoadSceneCancelledEvent:
+        case CityUIDLoadSceneCancelledEvent:
             scene_manager_previous_scene(app->scene_manager);
             consumed = true;
             break;
@@ -79,14 +79,14 @@ bool udecard_load_scene_on_event(void* context, SceneManagerEvent event) {
     return consumed;
 }
 
-void udecard_load_scene_on_exit(void* context) {
+void cityuid_load_scene_on_exit(void* context) {
     App* app = context;
 
     UNUSED(app);
     // nothing to do here
 }
 
-bool udecard_load_scene_file_path_dialog(App* app) {
+bool cityuid_load_scene_file_path_dialog(App* app) {
     DialogsFileBrowserOptions browser_options;
 
     dialog_file_browser_set_basic_options(&browser_options, ".nfc", &I_Nfc_10x10);

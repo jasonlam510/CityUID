@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -25,21 +25,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <gui/scene_manager.h>
 
 typedef enum {
-    UDECardMainMenuSceneItemRead,
-    UDECardMainMenuSceneItemLoad,
-    UDECardMainMenuSceneItemAbout,
-    UDECardMainMenuSceneItemCount
-} UDECardMainMenuSceneIndex;
+    CityUIDMainMenuSceneItemRead,
+    CityUIDMainMenuSceneItemLoad,
+    CityUIDMainMenuSceneItemAbout,
+    CityUIDMainMenuSceneItemCount
+} CityUIDMainMenuSceneIndex;
 
 typedef enum {
-    UDECardMainMenuSceneReadEvent,
-    UDECardMainMenuSceneLoadEvent,
-    UDECardMainMenuSceneAboutEvent,
-} UDECardMainMenuSceneEvent;
+    CityUIDMainMenuSceneReadEvent,
+    CityUIDMainMenuSceneLoadEvent,
+    CityUIDMainMenuSceneAboutEvent,
+} CityUIDMainMenuSceneEvent;
 
-void udecard_main_menu_callback(void* context, uint32_t index);
-void udecard_main_menu_scene_on_enter(void* context);
-bool udecard_main_menu_scene_on_event(void* context, SceneManagerEvent event);
-void udecard_main_menu_scene_on_exit(void* context);
+void cityuid_main_menu_callback(void* context, uint32_t index);
+void cityuid_main_menu_scene_on_enter(void* context);
+bool cityuid_main_menu_scene_on_event(void* context, SceneManagerEvent event);
+void cityuid_main_menu_scene_on_exit(void* context);
 
 #endif

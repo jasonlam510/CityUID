@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -24,14 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <furi.h>
 #include <gui/scene_manager.h>
 
-typedef enum UDECardDetectSceneEvent {
-    UDECardDetectSceneDetectedEvent,
-    UDECardDetectSceneErrorEvent,
-    UDECardDetectSceneFatalErrorEvent,
-} UDECardDetectSceneEvent;
+typedef enum CityUIDDetectSceneEvent {
+    CityUIDDetectSceneDetectedEvent,
+    CityUIDDetectSceneErrorEvent,
+    CityUIDDetectSceneFatalErrorEvent,
+} CityUIDDetectSceneEvent;
 
-void udecard_detect_scene_on_enter(void* context);
-bool udecard_detect_scene_on_event(void* context, SceneManagerEvent event);
-void udecard_detect_scene_on_exit(void* context);
+void cityuid_detect_scene_on_enter(void* context);
+bool cityuid_detect_scene_on_event(void* context, SceneManagerEvent event);
+void cityuid_detect_scene_on_exit(void* context);
 
 #endif

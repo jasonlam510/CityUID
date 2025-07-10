@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "udecard_app.h"
+#include "cityuid_app.h"
 
 #include <furi.h>
 
@@ -54,12 +54,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "scenes/about_scene.h"
 
 // helpers
-#include "helpers/udecard.h"
+#include "helpers/cityuid.h"
 #include "helpers/target_manager.h"
 #include "helpers/util.h"
 
 // icons
-#include <udecard_icons.h>
+#include <cityuid_icons.h>
 
 #include <dolphin/dolphin.h>
 
@@ -86,26 +86,26 @@ typedef struct App {
 
     FuriString* file_path;
 
-    UDECard* udecard;
+    CityUID* cityuid;
 } App;
 
 typedef enum {
-    UDECardSubmenuView,
-    UDECardTextBoxView,
-    UDECardPopupView,
-    UDECardWidgetView,
-} UDECardView;
+    CityUIDSubmenuView,
+    CityUIDTextBoxView,
+    CityUIDPopupView,
+    CityUIDWidgetView,
+} CityUIDView;
 
 typedef enum {
-    UDECardMainMenuScene,
-    UDECardDetectScene,
-    UDECardReadScene,
-    UDECardLoadScene,
-    UDECardResultsScene,
-    UDECardAboutScene,
-    UDECardSceneCount
-} UDECardScene;
+    CityUIDMainMenuScene,
+    CityUIDDetectScene,
+    CityUIDReadScene,
+    CityUIDLoadScene,
+    CityUIDResultsScene,
+    CityUIDAboutScene,
+    CityUIDSceneCount
+} CityUIDScene;
 
-void udecard_app_blink_start(App* app);
-void udecard_app_blink_stop(App* app);
-void udecard_app_error_dialog(App* app, const char* message);
+void cityuid_app_blink_start(App* app);
+void cityuid_app_blink_stop(App* app);
+void cityuid_app_error_dialog(App* app, const char* message);

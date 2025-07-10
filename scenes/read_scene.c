@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,9 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "read_scene.h"
 
-#include "udecard_app_i.h"
+#include "cityuid_app_i.h"
 
-NfcCommand udecard_read_scene_nfc_poller_callback(NfcGenericEvent event, void* context) {
+NfcCommand cityuid_read_scene_nfc_poller_callback(NfcGenericEvent event, void* context) {
     App* app = context;
 
     NfcCommand command = NfcCommandContinue;
@@ -33,12 +33,12 @@ NfcCommand udecard_read_scene_nfc_poller_callback(NfcGenericEvent event, void* c
 
     switch(mfc_event->type) {
     case MfClassicPollerEventTypeCardDetected:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardReadSceneCardDetectedEvent);
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDReadSceneCardDetectedEvent);
         command = NfcCommandContinue;
         break;
 
     case MfClassicPollerEventTypeCardLost:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardReadSceneCardLostEvent);
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDReadSceneCardLostEvent);
         command = NfcCommandStop;
         break;
 
@@ -53,7 +53,7 @@ NfcCommand udecard_read_scene_nfc_poller_callback(NfcGenericEvent event, void* c
         if(target == NULL) {
             // no more targets, stop poller
             mfc_event->data->read_sector_request_data.key_provided = false;
-            view_dispatcher_send_custom_event(app->view_dispatcher, UDECardReadSceneDoneEvent);
+            view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDReadSceneDoneEvent);
             break;
         }
         // configure read
@@ -71,7 +71,7 @@ NfcCommand udecard_read_scene_nfc_poller_callback(NfcGenericEvent event, void* c
         break;
 
     case MfClassicPollerEventTypeFail:
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardReadSceneErrorEvent);
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDReadSceneErrorEvent);
         break;
     default:
         break;
@@ -80,13 +80,13 @@ NfcCommand udecard_read_scene_nfc_poller_callback(NfcGenericEvent event, void* c
     return command;
 }
 
-void udecard_read_scene_on_enter(void* context) {
+void cityuid_read_scene_on_enter(void* context) {
     App* app = context;
 
     popup_reset(app->popup);
     popup_set_header(app->popup, "Don't move", 97, 15, AlignCenter, AlignTop);
     popup_set_icon(app->popup, 0, 8, &I_loading_24x24);
-    view_dispatcher_switch_to_view(app->view_dispatcher, UDECardPopupView);
+    view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDPopupView);
 
     // set read targets
     app->target_manager = read_target_manager_alloc();
@@ -101,12 +101,12 @@ void udecard_read_scene_on_enter(void* context) {
 
     // start nfc poller
     app->nfc_poller = nfc_poller_alloc(app->nfc, NfcProtocolMfClassic);
-    nfc_poller_start(app->nfc_poller, udecard_read_scene_nfc_poller_callback, app);
+    nfc_poller_start(app->nfc_poller, cityuid_read_scene_nfc_poller_callback, app);
 
-    udecard_app_blink_start(app);
+    cityuid_app_blink_start(app);
 }
 
-bool udecard_read_scene_on_event(void* context, SceneManagerEvent event) {
+bool cityuid_read_scene_on_event(void* context, SceneManagerEvent event) {
     App* app = context;
 
     bool consumed = false;
@@ -114,56 +114,56 @@ bool udecard_read_scene_on_event(void* context, SceneManagerEvent event) {
     switch(event.type) {
     case SceneManagerEventTypeCustom:
         switch(event.event) {
-        case UDECardReadSceneCardDetectedEvent:
+        case CityUIDReadSceneCardDetectedEvent:
             consumed = true;
             break;
-        case UDECardReadSceneCardLostEvent:
-        case UDECardReadSceneErrorEvent:
-            udecard_app_blink_stop(app);
-            udecard_app_error_dialog(app, "Card lost / Error occured.");
+        case CityUIDReadSceneCardLostEvent:
+        case CityUIDReadSceneErrorEvent:
+            cityuid_app_blink_stop(app);
+            cityuid_app_error_dialog(app, "Card lost / Error occured.");
             scene_manager_previous_scene(app->scene_manager);
             consumed = true;
             break;
-        case UDECardReadSceneDoneEvent:
-            udecard_app_blink_stop(app);
+        case CityUIDReadSceneDoneEvent:
+            cityuid_app_blink_stop(app);
             dolphin_deed(DolphinDeedNfcReadSuccess);
 
             // parse card data
-            UDECardLoadingResult loading_result =
-                udecard_load_from_nfc_device(app->udecard, app->nfc_device);
-            if(loading_result != UDECardLoadingResultSuccess) {
+            CityUIDLoadingResult loading_result =
+                cityuid_load_from_nfc_device(app->cityuid, app->nfc_device);
+            if(loading_result != CityUIDLoadingResultSuccess) {
                 view_dispatcher_send_custom_event(
-                    app->view_dispatcher, UDECardReadSceneLoadFailedEvent);
+                    app->view_dispatcher, CityUIDReadSceneLoadFailedEvent);
                 return true;
             }
-            UDECardParsingResult parsing_result =
-                udecard_parse(app->udecard, app->udecard->carddata);
+            CityUIDParsingResult parsing_result =
+                cityuid_parse(app->cityuid, app->cityuid->carddata);
             if(parsing_result &
-               UDECardParsingResultErrorMagic) { // other parsing errors are not fatal
+               CityUIDParsingResultErrorMagic) { // other parsing errors are not fatal
                 view_dispatcher_send_custom_event(
-                    app->view_dispatcher, UDECardReadSceneLoadFailedEvent);
+                    app->view_dispatcher, CityUIDReadSceneLoadFailedEvent);
                 return true;
             } else {
                 view_dispatcher_send_custom_event(
-                    app->view_dispatcher, UDECardReadSceneLoadSuccessEvent);
+                    app->view_dispatcher, CityUIDReadSceneLoadSuccessEvent);
             }
             consumed = true;
             break;
 
-        case UDECardReadSceneLoadFailedEvent:
-            if(app->udecard->loading_result != UDECardLoadingResultSuccess) {
-                udecard_app_error_dialog(
-                    app, udecard_loading_error_string(app->udecard->loading_result));
+        case CityUIDReadSceneLoadFailedEvent:
+            if(app->cityuid->loading_result != CityUIDLoadingResultSuccess) {
+                cityuid_app_error_dialog(
+                    app, cityuid_loading_error_string(app->cityuid->loading_result));
             } else { // parsing error
-                udecard_app_error_dialog(app, "Not a UDECard.");
+                cityuid_app_error_dialog(app, "Not a CityUID.");
             }
             scene_manager_previous_scene(app->scene_manager);
             consumed = true;
             break;
 
-        case UDECardReadSceneLoadSuccessEvent:
+        case CityUIDReadSceneLoadSuccessEvent:
             notification_message(app->notifications, &sequence_single_vibro);
-            scene_manager_next_scene(app->scene_manager, UDECardResultsScene);
+            scene_manager_next_scene(app->scene_manager, CityUIDResultsScene);
             consumed = true;
             break;
 
@@ -178,7 +178,7 @@ bool udecard_read_scene_on_event(void* context, SceneManagerEvent event) {
     return consumed;
 }
 
-void udecard_read_scene_on_exit(void* context) {
+void cityuid_read_scene_on_exit(void* context) {
     App* app = context;
 
     nfc_poller_stop(app->nfc_poller);
@@ -188,5 +188,5 @@ void udecard_read_scene_on_exit(void* context) {
     read_target_manager_free(app->target_manager);
 
     popup_reset(app->popup);
-    udecard_app_blink_stop(app);
+    cityuid_app_blink_stop(app);
 }

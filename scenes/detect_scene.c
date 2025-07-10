@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -20,9 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "detect_scene.h"
 
-#include "udecard_app_i.h"
+#include "cityuid_app_i.h"
 
-bool udecard_detect_scene_is_event_from_mfc(NfcScannerEvent event) {
+bool cityuid_detect_scene_is_event_from_mfc(NfcScannerEvent event) {
     if(event.type == NfcScannerEventTypeDetected) {
         for(unsigned int i = 0; i < event.data.protocol_num; i++) {
             if(event.data.protocols[i] == NfcProtocolMfClassic) {
@@ -33,16 +33,16 @@ bool udecard_detect_scene_is_event_from_mfc(NfcScannerEvent event) {
     return false;
 }
 
-void udecard_detect_scene_nfc_scanner_callback(NfcScannerEvent event, void* context) {
+void cityuid_detect_scene_nfc_scanner_callback(NfcScannerEvent event, void* context) {
     App* app = context;
 
     switch(event.type) {
     case NfcScannerEventTypeDetected:
-        if(udecard_detect_scene_is_event_from_mfc(event)) { // mfclassic?
+        if(cityuid_detect_scene_is_event_from_mfc(event)) { // mfclassic?
             view_dispatcher_send_custom_event(
-                app->view_dispatcher, UDECardDetectSceneDetectedEvent);
+                app->view_dispatcher, CityUIDDetectSceneDetectedEvent);
         } else {
-            view_dispatcher_send_custom_event(app->view_dispatcher, UDECardDetectSceneErrorEvent);
+            view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDDetectSceneErrorEvent);
         }
         break;
     default:
@@ -50,45 +50,45 @@ void udecard_detect_scene_nfc_scanner_callback(NfcScannerEvent event, void* cont
     }
 }
 
-void udecard_detect_scene_on_enter(void* context) {
+void cityuid_detect_scene_on_enter(void* context) {
     App* app = context;
 
     popup_reset(app->popup);
     popup_set_header(app->popup, "Reading", 97, 15, AlignCenter, AlignTop);
     popup_set_text(
-        app->popup, "Put UDECard\nnext to\nFlipper's back", 94, 27, AlignCenter, AlignTop);
+        app->popup, "Put CityUID\nnext to\nFlipper's back", 94, 27, AlignCenter, AlignTop);
     popup_set_icon(app->popup, 0, 8, &I_ApplyFlipperToUDE_60x50);
-    view_dispatcher_switch_to_view(app->view_dispatcher, UDECardPopupView);
+    view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDPopupView);
 
-    if(!udecard_gather_keys(app->sector_keys)) {
-        udecard_app_error_dialog(app, "Gathering keys failed.");
-        view_dispatcher_send_custom_event(app->view_dispatcher, UDECardDetectSceneFatalErrorEvent);
+    if(!cityuid_gather_keys(app->sector_keys)) {
+        cityuid_app_error_dialog(app, "Gathering keys failed.");
+        view_dispatcher_send_custom_event(app->view_dispatcher, CityUIDDetectSceneFatalErrorEvent);
     }
 
     // start nfc scanner
     app->nfc_scanner = nfc_scanner_alloc(app->nfc);
-    nfc_scanner_start(app->nfc_scanner, udecard_detect_scene_nfc_scanner_callback, app);
+    nfc_scanner_start(app->nfc_scanner, cityuid_detect_scene_nfc_scanner_callback, app);
 
-    udecard_app_blink_start(app);
+    cityuid_app_blink_start(app);
 }
 
-bool udecard_detect_scene_on_event(void* context, SceneManagerEvent event) {
+bool cityuid_detect_scene_on_event(void* context, SceneManagerEvent event) {
     App* app = context;
     bool consumed = false;
 
     switch(event.type) {
     case SceneManagerEventTypeCustom:
         switch(event.event) {
-        case UDECardDetectSceneDetectedEvent:
-            scene_manager_next_scene(app->scene_manager, UDECardReadScene);
+        case CityUIDDetectSceneDetectedEvent:
+            scene_manager_next_scene(app->scene_manager, CityUIDReadScene);
             consumed = true;
             break;
-        case UDECardDetectSceneErrorEvent:
+        case CityUIDDetectSceneErrorEvent:
             nfc_scanner_stop(app->nfc_scanner);
             nfc_scanner_start(
-                app->nfc_scanner, udecard_detect_scene_nfc_scanner_callback, context);
+                app->nfc_scanner, cityuid_detect_scene_nfc_scanner_callback, context);
             break;
-        case UDECardDetectSceneFatalErrorEvent:
+        case CityUIDDetectSceneFatalErrorEvent:
             scene_manager_previous_scene(app->scene_manager);
         }
         break;
@@ -99,11 +99,11 @@ bool udecard_detect_scene_on_event(void* context, SceneManagerEvent event) {
     return consumed;
 }
 
-void udecard_detect_scene_on_exit(void* context) {
+void cityuid_detect_scene_on_exit(void* context) {
     App* app = context;
     nfc_scanner_stop(app->nfc_scanner);
     nfc_scanner_free(app->nfc_scanner);
 
     popup_reset(app->popup);
-    udecard_app_blink_stop(app);
+    cityuid_app_blink_stop(app);
 }

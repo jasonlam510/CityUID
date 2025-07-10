@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -18,49 +18,49 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "udecard.h"
+#include "cityuid.h"
 
-#include "../udecard_app_i.h"
+#include "../cityuid_app_i.h"
 
-void UDECard_demo_fill(UDECard* udecard) {
+void CityUID_demo_fill(CityUID* cityuid) {
     FURI_LOG_I("UDECARD", "Filling demo card data.");
-    udecard->parsing_result = UDECardParsingResultSuccess;
-    udecard->loading_result = UDECardLoadingResultSuccess;
-    udecard->carddata = NULL;
-    strncpy(udecard->ksnr, "75837882", UDECARD_KSNR_SIZE_MAX_LENGTH); // ASCII "KSNR"
-    udecard->member_type = UDECardMemberTypeStudent;
-    strncpy(udecard->member_number, "68697779", UDECARD_MEMBER_NUMBER_SIZE); // ASCII "DEMO"
-    udecard->balance = (uint16_t)1512;
-    udecard->transaction_count = 142;
+    cityuid->parsing_result = CityUIDParsingResultSuccess;
+    cityuid->loading_result = CityUIDLoadingResultSuccess;
+    cityuid->carddata = NULL;
+    strncpy(cityuid->ksnr, "75837882", UDECARD_KSNR_SIZE_MAX_LENGTH); // ASCII "KSNR"
+    cityuid->member_type = CityUIDMemberTypeStudent;
+    strncpy(cityuid->member_number, "68697779", UDECARD_MEMBER_NUMBER_SIZE); // ASCII "DEMO"
+    cityuid->balance = (uint16_t)1512;
+    cityuid->transaction_count = 142;
 }
 
-UDECard* udecard_alloc() {
-    UDECard* udecard = malloc(sizeof(UDECard));
+CityUID* cityuid_alloc() {
+    CityUID* cityuid = malloc(sizeof(CityUID));
 
-    udecard->parsing_result = ~0;
-    udecard->loading_result = ~0;
+    cityuid->parsing_result = ~0;
+    cityuid->loading_result = ~0;
 
-    udecard->carddata = mf_classic_alloc();
-    memset(udecard->uid, 0, sizeof(udecard->uid));
+    cityuid->carddata = mf_classic_alloc();
+    memset(cityuid->uid, 0, sizeof(cityuid->uid));
 
-    memset(udecard->ksnr, 0, sizeof(udecard->ksnr));
-    udecard->member_type = UDECardMemberTypeUnknown;
-    memset(udecard->member_number, 0, sizeof(udecard->member_number));
+    memset(cityuid->ksnr, 0, sizeof(cityuid->ksnr));
+    cityuid->member_type = CityUIDMemberTypeUnknown;
+    memset(cityuid->member_number, 0, sizeof(cityuid->member_number));
 
-    udecard->balance = 0;
-    udecard->transaction_count = 0;
+    cityuid->balance = 0;
+    cityuid->transaction_count = 0;
 
-    return udecard;
+    return cityuid;
 }
 
-void udecard_free(UDECard* udecard) {
-    mf_classic_free(udecard->carddata);
+void cityuid_free(CityUID* cityuid) {
+    mf_classic_free(cityuid->carddata);
 
-    free(udecard);
+    free(cityuid);
 }
 
-bool udecard_parse_magic(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_magic(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     /* check for magic bytes */
     MfClassicBlock constant_block1 = mfclassicdata->block[UDECARD_CONSTANT_BLOCK1];
@@ -71,53 +71,53 @@ bool udecard_parse_magic(UDECard* udecard) {
        memcmp(
            constant_block2.data, UDECARD_CONSTANT_BLOCK2_CONTENTS, UDECARD_CONSTANT_BLOCK2_SIZE) !=
            0) {
-        // if we are here, this card is probably not a UDECard
+        // if we are here, this card is probably not a CityUID
         return false;
     }
     return true;
 }
 
-bool udecard_parse_ksnr(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_ksnr(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     MfClassicBlock uid_block = mfclassicdata->block[UDECARD_UID_BLOCK];
     uint8_t uid[UDECARD_UID_SIZE];
     memcpy(uid, uid_block.data, UDECARD_UID_SIZE);
-    uid_to_ksnr(udecard->ksnr, uid);
+    uid_to_ksnr(cityuid->ksnr, uid);
 
-    remove_leading_zeros_from_string(udecard->ksnr);
+    remove_leading_zeros_from_string(cityuid->ksnr);
 
     return true;
 }
 
-bool udecard_parse_member_type(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_member_type(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     MfClassicBlock member_type_block = mfclassicdata->block[UDECARD_MEMBERTYPE_BLOCK];
     uint8_t member_type_1 = member_type_block.data[UDECARD_MEMBERTYPE_BYTE_IN_BLOCK_1OCC];
     uint8_t member_type_2 = member_type_block.data[UDECARD_MEMBERTYPE_BYTE_IN_BLOCK_2OCC];
     // check second occurence of member type
     if(member_type_1 != member_type_2) {
-        udecard->member_type = UDECardMemberTypeUnknown;
+        cityuid->member_type = CityUIDMemberTypeUnknown;
         return false;
     } else
         switch(member_type_1) {
         case UDECARD_MEMBER_TYPE_STUDENT_BYTE:
-            udecard->member_type = UDECardMemberTypeStudent;
+            cityuid->member_type = CityUIDMemberTypeStudent;
             break;
         case UDECARD_MEMBER_TYPE_EMPLOYEE_BYTE:
-            udecard->member_type = UDECardMemberTypeEmployee;
+            cityuid->member_type = CityUIDMemberTypeEmployee;
             break;
         default:
-            udecard->member_type = UDECardMemberTypeUnknown;
+            cityuid->member_type = CityUIDMemberTypeUnknown;
             return false;
         }
 
     return true;
 }
 
-bool udecard_parse_balance(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_balance(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     uint8_t* balance_data_1 =
         mfclassicdata->block[UDECARD_BALANCE_BLOCK_1OCC].data + UDECARD_BALANCE_BYTE_1OCC;
@@ -126,16 +126,16 @@ bool udecard_parse_balance(UDECard* udecard) {
     int balance_1 = xor3_to_int(balance_data_1);
     int balance_2 = xor3_to_int(balance_data_2);
     if(balance_1 != balance_2 || balance_1 == -1) {
-        udecard->balance = 0;
+        cityuid->balance = 0;
         return false;
     } else
-        udecard->balance = balance_1;
+        cityuid->balance = balance_1;
 
     return true;
 }
 
-bool udecard_parse_transaction_count(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_transaction_count(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     uint8_t* transaction_count_data_1 =
         mfclassicdata->block[UDECARD_TRANSCOUNT_BLOCK_1OCC].data + UDECARD_TRANSCOUNT_BYTE_1OCC;
@@ -144,25 +144,25 @@ bool udecard_parse_transaction_count(UDECard* udecard) {
     int transaction_count_1 = xor3_to_int(transaction_count_data_1);
     int transaction_count_2 = xor3_to_int(transaction_count_data_2);
     if(transaction_count_1 != transaction_count_2 || transaction_count_1 == -1) {
-        udecard->transaction_count = 0;
+        cityuid->transaction_count = 0;
         return false;
     } else
-        udecard->transaction_count = transaction_count_1;
+        cityuid->transaction_count = transaction_count_1;
 
     return true;
 }
 
-bool udecard_parse_member_number(UDECard* udecard) {
-    MfClassicData* mfclassicdata = udecard->carddata;
+bool cityuid_parse_member_number(CityUID* cityuid) {
+    MfClassicData* mfclassicdata = cityuid->carddata;
 
     char* snumber_data_1 = (char*)mfclassicdata->block[UDECARD_MEMBER_NUMBER_BLOCK_1OCC].data + 1;
     char* snumber_data_2 = (char*)mfclassicdata->block[UDECARD_MEMBER_NUMBER_BLOCK_2OCC].data + 1;
     char* snumber_data_3 = (char*)mfclassicdata->block[UDECARD_MEMBER_NUMBER_BLOCK_3OCC].data + 1;
     char* snumber_data_4 = (char*)mfclassicdata->block[UDECARD_MEMBER_NUMBER_BLOCK_4OCC].data + 1;
 
-    strncpy(udecard->member_number, snumber_data_1, UDECARD_MEMBER_NUMBER_SIZE);
-    reverse_string(udecard->member_number);
-    remove_leading_zeros_from_string(udecard->member_number);
+    strncpy(cityuid->member_number, snumber_data_1, UDECARD_MEMBER_NUMBER_SIZE);
+    reverse_string(cityuid->member_number);
+    remove_leading_zeros_from_string(cityuid->member_number);
 
     // check whether there is a mismatch...
     if(!(strncmp(snumber_data_1, snumber_data_2, UDECARD_MEMBER_NUMBER_SIZE) == 0 &&
@@ -174,29 +174,29 @@ bool udecard_parse_member_number(UDECard* udecard) {
     return true;
 }
 
-UDECardParsingResult udecard_parse(UDECard* udecard, MfClassicData* mfclassicdata) {
-    udecard->carddata = mfclassicdata;
+CityUIDParsingResult cityuid_parse(CityUID* cityuid, MfClassicData* mfclassicdata) {
+    cityuid->carddata = mfclassicdata;
 
-    udecard->parsing_result = UDECardParsingResultSuccess;
+    cityuid->parsing_result = CityUIDParsingResultSuccess;
 
-    bool (*parse_functions[])(UDECard*) = {
-        udecard_parse_magic,
-        udecard_parse_ksnr,
-        udecard_parse_member_type,
-        udecard_parse_balance,
-        udecard_parse_member_number,
-        udecard_parse_transaction_count,
+    bool (*parse_functions[])(CityUID*) = {
+        cityuid_parse_magic,
+        cityuid_parse_ksnr,
+        cityuid_parse_member_type,
+        cityuid_parse_balance,
+        cityuid_parse_member_number,
+        cityuid_parse_transaction_count,
     };
 
     for(unsigned int i = 0; i < sizeof(parse_functions) / sizeof(parse_functions[0]); i++) {
-        if(!parse_functions[i](udecard)) {
-            udecard->parsing_result |= (1 << i);
+        if(!parse_functions[i](cityuid)) {
+            cityuid->parsing_result |= (1 << i);
         }
     }
 
-    // UDECard_demo_fill(udecard);
+    // CityUID_demo_fill(cityuid);
 
-    return udecard->parsing_result;
+    return cityuid->parsing_result;
 }
 
 void uid_to_ksnr(char* ksnr, uint8_t* uid) {
@@ -222,50 +222,50 @@ int xor3_to_int(const uint8_t* bytes) {
     return balance;
 }
 
-UDECardLoadingResult udecard_load_from_nfc_device(UDECard* udecard, NfcDevice* nfc_device) {
-    if(!nfc_device) return udecard->loading_result = UDECardLoadingResultErrorNotNFC;
+CityUIDLoadingResult cityuid_load_from_nfc_device(CityUID* cityuid, NfcDevice* nfc_device) {
+    if(!nfc_device) return cityuid->loading_result = CityUIDLoadingResultErrorNotNFC;
 
     FURI_LOG_I(
         "UDECARD", "Loading from NFC device, protocol: %d", nfc_device_get_protocol(nfc_device));
 
     if(nfc_device_get_protocol(nfc_device) != NfcProtocolMfClassic) {
-        return udecard->loading_result = UDECardLoadingResultErrorNotMfClassic;
+        return cityuid->loading_result = CityUIDLoadingResultErrorNotMfClassic;
     }
 
     const MfClassicData* c_mfclassicdata = nfc_device_get_data(nfc_device, NfcProtocolMfClassic);
-    mf_classic_copy(udecard->carddata, c_mfclassicdata);
+    mf_classic_copy(cityuid->carddata, c_mfclassicdata);
 
-    return udecard->loading_result = UDECardLoadingResultSuccess;
+    return cityuid->loading_result = CityUIDLoadingResultSuccess;
 }
 
-UDECardLoadingResult udecard_load_from_path(UDECard* udecard, FuriString* path) {
+CityUIDLoadingResult cityuid_load_from_path(CityUID* cityuid, FuriString* path) {
     NfcDevice* nfc_device = nfc_device_alloc();
     if(!nfc_device_load(nfc_device, furi_string_get_cstr(path)))
-        return udecard->loading_result = UDECardLoadingResultErrorNotNFC;
+        return cityuid->loading_result = CityUIDLoadingResultErrorNotNFC;
 
-    if((udecard->loading_result = udecard_load_from_nfc_device(udecard, nfc_device)) !=
-       UDECardLoadingResultSuccess) {
+    if((cityuid->loading_result = cityuid_load_from_nfc_device(cityuid, nfc_device)) !=
+       CityUIDLoadingResultSuccess) {
         nfc_device_free(nfc_device);
-        return udecard->loading_result;
+        return cityuid->loading_result;
     }
 
     nfc_device_free(nfc_device);
 
-    return udecard->loading_result;
+    return cityuid->loading_result;
 }
 
-char* udecard_loading_error_string(UDECardLoadingResult loading_result) {
+char* cityuid_loading_error_string(CityUIDLoadingResult loading_result) {
     switch(loading_result) {
-    case UDECardLoadingResultErrorNotNFC:
+    case CityUIDLoadingResultErrorNotNFC:
         return "Not an NFC file.";
-    case UDECardLoadingResultErrorNotMfClassic:
+    case CityUIDLoadingResultErrorNotMfClassic:
         return "Not a MifareClassic card.";
     default:
         return "Unknown error.";
     }
 }
 
-bool udecard_gather_keys(uint8_t sector_keys[][6]) {
+bool cityuid_gather_keys(uint8_t sector_keys[][6]) {
     if(!keys_dict_check_presence(EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH))) {
         FURI_LOG_E(
             "UDECARD", "Keys dictionary not found at %s", EXT_PATH(FLIPPER_MFCLASSIC_DICT_PATH));
@@ -295,7 +295,7 @@ bool udecard_gather_keys(uint8_t sector_keys[][6]) {
         }
     }
 
-    int udecard_keys_indices[] = {
+    int cityuid_keys_indices[] = {
         UDECARD_KEYA_0_INDEX,
         UDECARD_KEYA_1_INDEX,
         UDECARD_KEYA_2_INDEX,
@@ -303,21 +303,21 @@ bool udecard_gather_keys(uint8_t sector_keys[][6]) {
         UDECARD_KEYA_4_INDEX,
         UDECARD_KEYA_5_INDEX,
     };
-    int udecard_keys_total = sizeof(udecard_keys_indices) / sizeof(udecard_keys_indices[0]);
-    uint8_t gathered_keys[udecard_keys_total][16];
+    int cityuid_keys_total = sizeof(cityuid_keys_indices) / sizeof(cityuid_keys_indices[0]);
+    uint8_t gathered_keys[cityuid_keys_total][16];
 
     uint8_t curkey[6] = {0};
     int found = 0;
     for(int i = 1;
-        keys_dict_get_next_key(keys_dict, curkey, sizeof(curkey)) && found < udecard_keys_total;
+        keys_dict_get_next_key(keys_dict, curkey, sizeof(curkey)) && found < cityuid_keys_total;
         i++) {
-        if(udecard_keys_indices[found] == i) {
+        if(cityuid_keys_indices[found] == i) {
             memcpy(gathered_keys[found], curkey, sizeof(curkey));
             found++;
         }
     }
 
-    for(int i = 0; i < udecard_keys_total; i++) {
+    for(int i = 0; i < cityuid_keys_total; i++) {
         FURI_LOG_I(
             "UDECARD",
             "Key %d: %02X %02X %02X %02X %02X %02X",

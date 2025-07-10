@@ -1,5 +1,5 @@
 /*
-This file is part of UDECard App.
+This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
 Copyright (C) 2025 Alexander Hahn
@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define VERSION "v1.0.3"
 #define ABOUT_TEXT                                                          \
-    "UDECard Parser " VERSION "\n"                                          \
+    "CityUID Parser " VERSION "\n"                                          \
     "by Alexander Hahn\n(github.com/hahnworks)\n\n"                         \
                                                                             \
     "Copyright (C) 2025\n"                                                  \
@@ -39,8 +39,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "        \
     "GNU General Public License for more details."
 
-void udecard_about_scene_on_enter(void* context);
-bool udecard_about_scene_on_event(void* context, SceneManagerEvent event);
-void udecard_about_scene_on_exit(void* context);
+void cityuid_about_scene_on_enter(void* context);
+bool cityuid_about_scene_on_event(void* context, SceneManagerEvent event);
+void cityuid_about_scene_on_exit(void* context);
 
 #endif
