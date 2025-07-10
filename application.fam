@@ -21,7 +21,7 @@ App(
     fap_category="NFC",
     fap_version="1.0.3",
     fap_icon="cityuid.png",
-    fap_author="Alexander Hahn (github.com/hahnworks)",
-    fap_weburl="https://github.com/hahnworks/CityUID",
+    fap_author="Jason Lam (github.com/jasonlam510)",
+    fap_weburl="https://github.com/jasonlam510/CityUID",
     fap_icon_assets="images",
 )
