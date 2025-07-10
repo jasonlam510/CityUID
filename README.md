@@ -36,9 +36,10 @@ Should you have any Intercards from other institutions, you may find the [Techni
 
 ## Properties this app supports
 
-- Student Name
 - Student ID Number
-- Card Validity Period (Start Date - End Date)
+- Card Issue Date
+- Card Expiry Date
+- Student Name
 - Admit Date
 
 
