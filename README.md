@@ -1,47 +1,46 @@
-# 🪪🔍 UDECard
+# CityUID
 
-Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
+Flipper Zero application to extracts and displays basic information student ID cards from the City University of Hong Kong.
 
-> [!TIP]
-> Download UDECard [directly from the Flipper Application Catalog](https://lab.flipper.net/apps/udecard)
-
-![Screen capture of UDECard](.readme_assets/animation.gif)
+This repository is a fork of the original [UDECard project](https://github.com/hahnworks/UDECard) by hahnworks, adapted for City University of Hong Kong student ID cards.
 
 ## Motivation
 
-The University of Duisburg-Essen utilises a system known as Intercard for the purposes of payment and authentication within the library.
-These are MIFARE Classic 1K cards, whose keys are readily available in the Flippers dictionary.
-However, the Flipper lacks any support for useful information extraction.
-This application enables parsing of such cards.
+This project was born from a curiosity about NFC technology and a desire to understand how student ID cards work at City University of Hong Kong. While exploring the technical aspects of MIFARE Classic 1K cards, I discovered that the Flipper Zero lacked proper tools for analyzing the data structure of these cards.
 
-> [!IMPORTANT]
-> For legal reasons, no keys for reading the card are included in this application.
-> Hence, your Flipper Zero has to have the usual `mf_classic_dict.nfc` installed (it probably does).
-> The functionality of this application is limited to parsing the contents of the card.
-> No modifications are possible or will be made possible in the future.
-> **[See legal information (in German)](docs/Legal.md)**
+This application serves as an educational tool for students and researchers interested in NFC technology, providing a legal and ethical way to understand card data structures without compromising security. It demonstrates how to parse and display card information while respecting institutional policies and regulations.
+
+**Educational Goals:**
+- Learn about MIFARE Classic card data structures
+- Understand NFC technology and its applications
+- Provide a safe, legal framework for studying card systems
+- Share knowledge with the academic community
+
+## Legal and Ethical Compliance
+
+**⚠️ Important: City University of Hong Kong Student ID Card Policy**
+
+According to the [City University of Hong Kong Student Identity Card Regulations](https://www.cityu.edu.hk/arro/regu/regu_idru.htm):
+
+> "Alteration, falsification, or misuse of the Student Identity Card is a violation of the Code of Student Conduct, and other related university rules and regulations, and will be subject to disciplinary action. Fraudulent use of the Student Identity Card may also result in criminal charges and/or civil proceedings."
+
+**For legal and ethical reasons, this application:**
+- Does NOT include any keys for reading CityU student ID cards that are not already available in standard Flipper Zero dictionaries
+- Is limited to parsing card contents only (read-only functionality)
+- Does NOT enable any modifications to the card data
+- Will NOT provide any additional keys or methods to access protected card sectors
+
+Your Flipper Zero must have the standard `mf_classic_dict.nfc` installed to use this application.
 
 Should you have any Intercards from other institutions, you may find the [Technical Details](docs/Technical_Details.md) document helpful.
 
 ## Properties this app supports
 
-- KS-Nr.
-- Member type (Student/Employee)
-- Student number (Matrikelnummer)
-- Balance
-- Transaction count
+- Student Name
+- Student ID Number
+- Card Validity Period (Start Date - End Date)
+- Admit Date
 
-## Build/Install
-
-### Flipper Application Catalog
-
-You can install it [from the Flipper Application Catalog](https://lab.flipper.net/apps/udecard) using the Flipper Mobile App or Flipper Lab.
-
-### Manual installation
-
-Alternatively, you can manually download the latest release [here on GitHub](https://github.com/hahnworks/UDECard/releases).
-
-For building/installing from source, running `ufbt` / `ufbt launch` is sufficient.
 
 ## Usage
 
@@ -58,8 +57,10 @@ For building/installing from source, running `ufbt` / `ufbt launch` is sufficien
 
 ## Acknowledgements
 
-### Copyright
+The following images and assets are currently inherited from the original [UDECard project](https://github.com/hahnworks/UDECard):
 
 - `images/ApplyFlipperToUDE_60x50.png` is based on `NFC_manual_60x50.png` from the [Flipper Zero Firmware](https://github.com/flipperdevices/flipperzero-firmware)
 - `images/loading_24x24.png` is taken from `Loading_24` from the [Flipper Zero Firmware](https://github.com/flipperdevices/flipperzero-firmware)
 - `images/Nfc_10x10.png` is taken from `Nfc_10px.png` from the [Flipper Zero Firmware](https://github.com/flipperdevices/flipperzero-firmware)
+
+*This section will be updated if/when original images are created for CityUID.*
