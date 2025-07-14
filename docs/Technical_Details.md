@@ -46,7 +46,13 @@ This pattern appears to be ASCII characters "0130" followed by space padding, wh
 | Student Name | Blocks 12-17 (Sector 3) | ASCII, space-padded | 96 bytes | Full student name spanning multiple blocks |
 | Admit Date | Block 29 (Sector 7) | ASCII, YYYYMMDD | 16 bytes | Student admission date |
 
+
 ### Field Details
+
+#### Card Type Identification
+CityU cards can be identified by the prefix in the ID field:
+- **SD**: Student (e.g., "SD123456780")
+- **Others**: Any other prefix (staff, alumni, etc. - future support)
 
 #### Student ID Format (Block 1)
 - **Format**: `SDXXXXXXXX#`
