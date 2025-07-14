@@ -2,7 +2,8 @@
 This file is part of CityUID App.
 A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
 
-Copyright (C) 2025 Alexander Hahn
+Based on UDECard App by Alexander Hahn (https://github.com/hahnworks/UDECard)
+Copyright (C) 2025 Jason Lam (github.com/jasonlam510)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
