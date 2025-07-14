@@ -23,62 +23,63 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "cityuid_app_i.h"
 
+#define CITYUID_STUDENT_ID_BLOCK 1
+#define CITYUID_CARD_EXPIRY_BLOCK 4
+#define CITYUID_CARD_ISSUE_BLOCK 5
+#define CITYUID_STUDENT_NAME_BLOCK1 12
+#define CITYUID_STUDENT_NAME_BLOCK2 13
+#define CITYUID_STUDENT_NAME_BLOCK3 14
+#define CITYUID_STUDENT_NAME_BLOCK4 16
+#define CITYUID_STUDENT_NAME_BLOCK5 17
+#define CITYUID_ADMIT_DATE_BLOCK 29
+
 void cityuid_results_scene_on_enter(void* context) {
     App* app = context;
-
     CityUID* cityuid = app->cityuid;
 
     widget_reset(app->widget);
 
-    char ksnr_string[sizeof("KS-Nr. ") + UDECARD_KSNR_SIZE_MAX_LENGTH] = {0};
-    char member_type_string[sizeof("[!?] Member type: Employee")] = {0};
-    char member_number_string[sizeof("[!?] Employee No.: ") + UDECARD_MEMBER_NUMBER_SIZE] = {0};
-    char balance_string[sizeof("[!?] Balance: 000.00 EUR")] = {0};
-    char transaction_string[sizeof("[!?] Transactions: 00000")] = {0};
-    char error_string[sizeof("(Parsing error: 000)")] = {0};
+    // Header: SID: XXXXXXXX (numeric part only)
+    char sid_header[32] = {0};
+    char id_only[9] = {0};
+    if(strlen(cityuid->student_id) >= 10) {
+        strncpy(id_only, cityuid->student_id + 2, 8);
+        id_only[8] = '\0';
+    } else {
+        strncpy(id_only, cityuid->student_id, sizeof(id_only) - 1);
+    }
+    snprintf(sid_header, sizeof(sid_header), "SID: %s", id_only);
+    widget_add_string_element(app->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, sid_header);
 
-    snprintf(ksnr_string, sizeof(ksnr_string), "KS-Nr. %s", cityuid->ksnr);
-    snprintf(
-        member_type_string,
-        sizeof(member_type_string),
-        "Member type: %s %s",
-        UDECARD_MEMBER_TYPE_TO_STRING(cityuid->member_type),
-        cityuid->parsing_result & CityUIDParsingResultErrorMemberType ? "[!?]" : "");
-    snprintf(
-        member_number_string,
-        sizeof(member_number_string),
-        "%s No.: %s %s",
-        UDECARD_MEMBER_TYPE_TO_STRING(cityuid->member_type),
-        cityuid->member_number,
-        cityuid->parsing_result & CityUIDParsingResultErrorMemberNumber ? "[!?]" : "");
-    snprintf(
-        balance_string,
-        sizeof(balance_string),
-        "Balance: %d.%02d EUR %s",
-        cityuid->balance / 100,
-        cityuid->balance % 100,
-        cityuid->parsing_result & CityUIDParsingResultErrorBalance ? "[!?]" : "");
-    snprintf(
-        transaction_string,
-        sizeof(transaction_string),
-        "Transactions: %d %s",
-        cityuid->transaction_count,
-        cityuid->parsing_result & CityUIDParsingResultErrorTransactionCount ? "[!?]" : "");
-    if(cityuid->parsing_result != CityUIDParsingResultSuccess)
-        snprintf(
-            error_string, sizeof(error_string), "(Parsing error: %03i)", cityuid->parsing_result);
+    // Student Name
+    char name_string[128];
+    snprintf(name_string, sizeof(name_string), "Student Name: %s", cityuid->student_name);
+    widget_add_string_element(app->widget, 0, 14, AlignLeft, AlignTop, FontSecondary, name_string);
 
-    widget_add_string_element(app->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, ksnr_string);
-    widget_add_string_element(
-        app->widget, 0, 11, AlignLeft, AlignTop, FontSecondary, member_type_string);
-    widget_add_string_element(
-        app->widget, 0, 21, AlignLeft, AlignTop, FontSecondary, member_number_string);
-    widget_add_string_element(
-        app->widget, 0, 31, AlignLeft, AlignTop, FontSecondary, balance_string);
-    widget_add_string_element(
-        app->widget, 0, 41, AlignLeft, AlignTop, FontSecondary, transaction_string);
-    widget_add_string_element(
-        app->widget, 0, 51, AlignLeft, AlignTop, FontSecondary, error_string);
+    // Card Type
+    char card_type_string[32];
+    snprintf(card_type_string, sizeof(card_type_string), "Card Type: %s", CITYUID_CARD_TYPE_TO_STRING(cityuid->card_type));
+    widget_add_string_element(app->widget, 0, 24, AlignLeft, AlignTop, FontSecondary, card_type_string);
+
+    // Card Issue Number (last digit of student_id)
+    char issue_number_string[32];
+    char issue_number = (strlen(cityuid->student_id) >= 11) ? cityuid->student_id[10] : '?';
+    snprintf(issue_number_string, sizeof(issue_number_string), "Card Issue Number: %c", issue_number);
+    widget_add_string_element(app->widget, 0, 34, AlignLeft, AlignTop, FontSecondary, issue_number_string);
+
+    // Expiry (skip first 3 chars if prefix is 'STA', show only YYYYMMDD)
+    char expiry_string[32];
+    if (strncmp(cityuid->card_expiry_date, "STA", 3) == 0 && strlen(cityuid->card_expiry_date) >= 11) {
+        snprintf(expiry_string, sizeof(expiry_string), "Expiry: %.8s", cityuid->card_expiry_date + 3);
+    } else {
+        snprintf(expiry_string, sizeof(expiry_string), "Expiry: %s", cityuid->card_expiry_date);
+    }
+    widget_add_string_element(app->widget, 0, 44, AlignLeft, AlignTop, FontSecondary, expiry_string);
+
+    // Admit Date
+    char admit_string[32];
+    snprintf(admit_string, sizeof(admit_string), "Admit Date: %s", cityuid->admit_date);
+    widget_add_string_element(app->widget, 0, 54, AlignLeft, AlignTop, FontSecondary, admit_string);
 
     view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDWidgetView);
 }

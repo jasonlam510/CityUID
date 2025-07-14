@@ -26,11 +26,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define VERSION "v1.0.3"
 #define ABOUT_TEXT                                                          \
-    "CityUID Parser " VERSION "\n"                                          \
-    "by Alexander Hahn\n(github.com/hahnworks)\n\n"                         \
+    "CityU Student Card Parser " VERSION "\n"                               \
+    "by Jason Lam\n(github.com/jasonlam510)\n\n"                            \
+    "Based on UDECard by Alexander Hahn\n(github.com/hahnworks)\n\n"        \
                                                                             \
     "Copyright (C) 2025\n"                                                  \
-    "Alexander Hahn\n\n"                                                    \
+    "Jason Lam\n\n"                                                         \
     "This program is free software: you can redistribute it and/or modify " \
     "it under the terms of the GNU General Public License as published by " \
     "the Free Software Foundation, either version 3 of the License, or "    \

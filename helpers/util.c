@@ -48,3 +48,15 @@ void remove_leading_zeros_from_string(char* str) {
         memmove(str, str + i, len - i + 1);
     }
 }
+
+void remove_trailing_spaces_from_string(char* str) {
+    int len = strlen(str);
+    
+    // Find the last non-space character
+    while(len > 0 && (str[len - 1] == ' ' || str[len - 1] == '\0')) {
+        len--;
+    }
+    
+    // Null terminate at the last non-space character
+    str[len] = '\0';
+}

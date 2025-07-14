@@ -62,7 +62,7 @@ bool cityuid_load_scene_on_event(void* context, SceneManagerEvent event) {
                 cityuid_app_error_dialog(
                     app, cityuid_loading_error_string(app->cityuid->loading_result));
             } else { // parsing error
-                cityuid_app_error_dialog(app, "Not a CityUID.");
+                cityuid_app_error_dialog(app, "Not a CityU Student Card.");
             }
             cityuid_load_scene_on_enter(context); // reopen file dialog
             consumed = true;

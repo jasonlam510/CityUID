@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ReadTarget* read_target_alloc(uint8_t sector_num, const uint8_t* keyA) {
     ReadTarget* target = malloc(sizeof(ReadTarget));
     target->sector_num = sector_num;
-    memcpy(&target->keyA.data, keyA, UDECARD_KEY_SIZE);
+    memcpy(&target->keyA.data, keyA, CITYUID_KEY_SIZE);
     target->next = NULL;
     return target;
 }

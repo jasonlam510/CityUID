@@ -83,7 +83,7 @@ typedef struct App {
 
     ReadTargetManager* target_manager; // allocated and free'd on demand
 
-    uint8_t sector_keys[16][UDECARD_KEY_SIZE];
+    uint8_t sector_keys[16][CITYUID_KEY_SIZE];
 
     FuriString* file_path;
 

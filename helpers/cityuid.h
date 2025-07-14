@@ -1,6 +1,6 @@
 /*
 This file is part of CityUID App.
-A Flipper Zero application to analyse student ID cards from the University of Duisburg-Essen (Intercard)
+A Flipper Zero application to analyse student ID cards from City University of Hong Kong
 
 Based on UDECard App by Alexander Hahn (https://github.com/hahnworks/UDECard)
 Copyright (C) 2025 Jason Lam (github.com/jasonlam510)
@@ -19,85 +19,70 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef UDECARD_H
-#define UDECARD_H
+#ifndef CITYUID_H
+#define CITYUID_H
 
 #include <furi.h>
 
 #include <nfc/nfc_device.h>
 
-#define BLOCKS_PER_SECTOR 4
-
-#define UDECARD_UID_BLOCK (0 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_UID_SIZE  4
+#define CITYUID_UID_BLOCK 0
+#define CITYUID_UID_SIZE  4
 
 // used to identify whether the card is a CityUID
-#define UDECARD_CONSTANT_BLOCK1 (0 * BLOCKS_PER_SECTOR + 1)
-#define UDECARD_CONSTANT_BLOCK1_CONTENTS_BYTES \
-    {0x55, 0x06, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a, 0x38, 0x2a}
-static const uint8_t UDECARD_CONSTANT_BLOCK1_CONTENTS[] = UDECARD_CONSTANT_BLOCK1_CONTENTS_BYTES;
-#define UDECARD_CONSTANT_BLOCK1_SIZE 16
+#define CITYUID_CONSTANT_BLOCK2 2
+#define CITYUID_CONSTANT_BLOCK2_CONTENTS_BYTES \
+    {0x30, 0x31, 0x33, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20}
+static const uint8_t CITYUID_CONSTANT_BLOCK2_CONTENTS[] = CITYUID_CONSTANT_BLOCK2_CONTENTS_BYTES;
+#define CITYUID_CONSTANT_BLOCK2_SIZE 16
 
-#define UDECARD_CONSTANT_BLOCK2 (0 * BLOCKS_PER_SECTOR + 2)
-#define UDECARD_CONSTANT_BLOCK2_CONTENTS_BYTES \
-    {0x38, 0x2a, 0x38, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-static const uint8_t UDECARD_CONSTANT_BLOCK2_CONTENTS[] = UDECARD_CONSTANT_BLOCK2_CONTENTS_BYTES;
-#define UDECARD_CONSTANT_BLOCK2_SIZE 16
+// student ID
+#define CITYUID_STUDENT_ID_BLOCK 1
+#define CITYUID_STUDENT_ID_SIZE 12
 
-// membertype
-#define UDECARD_MEMBERTYPE_BLOCK              (1 * BLOCKS_PER_SECTOR + 2)
-#define UDECARD_MEMBERTYPE_BYTE_IN_BLOCK_1OCC 0
-#define UDECARD_MEMBERTYPE_BYTE_IN_BLOCK_2OCC 2
-#define UDECARD_MEMBER_TYPE_STUDENT_BYTE      0x02
-#define UDECARD_MEMBER_TYPE_EMPLOYEE_BYTE     0x03
+// card expiry date
+#define CITYUID_CARD_EXPIRY_BLOCK 4
+#define CITYUID_CARD_EXPIRY_SIZE 12
 
-// balance
-#define UDECARD_BALANCE_BLOCK_1OCC (3 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_BALANCE_BYTE_1OCC  2
-#define UDECARD_BALANCE_BLOCK_2OCC (3 * BLOCKS_PER_SECTOR + 1)
-#define UDECARD_BALANCE_BYTE_2OCC  7
+// card issue date
+#define CITYUID_CARD_ISSUE_BLOCK 5
+#define CITYUID_CARD_ISSUE_SIZE 8
 
-// transaction counter
-#define UDECARD_TRANSCOUNT_BLOCK_1OCC (2 * BLOCKS_PER_SECTOR + 2)
-#define UDECARD_TRANSCOUNT_BYTE_1OCC  13
-#define UDECARD_TRANSCOUNT_BLOCK_2OCC (3 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_TRANSCOUNT_BYTE_2OCC  10
+// student name (spans multiple blocks)
+#define CITYUID_STUDENT_NAME_BLOCK1 12
+#define CITYUID_STUDENT_NAME_BLOCK2 13
+#define CITYUID_STUDENT_NAME_BLOCK3 14
+#define CITYUID_STUDENT_NAME_BLOCK4 16
+#define CITYUID_STUDENT_NAME_BLOCK5 17
+#define CITYUID_STUDENT_NAME_TOTAL_SIZE 96
 
-// student number
-#define UDECARD_MEMBER_NUMBER_BLOCK_1OCC (5 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_MEMBER_NUMBER_BLOCK_2OCC (6 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_MEMBER_NUMBER_BLOCK_3OCC (8 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_MEMBER_NUMBER_BLOCK_4OCC (9 * BLOCKS_PER_SECTOR + 0)
-#define UDECARD_MEMBER_NUMBER_SIZE       12
+// admit date
+#define CITYUID_ADMIT_DATE_BLOCK 29
+#define CITYUID_ADMIT_DATE_SIZE 8
 
-// key locations in flipper’s dictonary
+// key locations in flipper's dictionary (assuming same keys as UDE for now)
 #define FLIPPER_MFCLASSIC_DICT_PATH       "nfc/assets/mf_classic_dict.nfc"
 #define FLIPPER_MFCLASSIC_DICT_TOTAL_KEYS 2042
-#define UDECARD_KEY_SIZE                  6
-#define UDECARD_KEYA_0_INDEX              3
-#define UDECARD_KEYA_1_INDEX              206
-#define UDECARD_KEYA_2_INDEX              208
-#define UDECARD_KEYA_3_INDEX              212
-#define UDECARD_KEYA_4_INDEX              214
-#define UDECARD_KEYA_5_INDEX              431
-
-#define UDECARD_KSNR_SIZE_MAX_LENGTH 10
+#define CITYUID_KEY_SIZE                  6
+#define CITYUID_KEYA_0_INDEX              3
+#define CITYUID_KEYA_1_INDEX              206
+#define CITYUID_KEYA_2_INDEX              208
+#define CITYUID_KEYA_3_INDEX              212
+#define CITYUID_KEYA_4_INDEX              214
+#define CITYUID_KEYA_5_INDEX              431
 
 #include <nfc/protocols/mf_classic/mf_classic.h>
 
-// AFAIK the University also issues cash cards (for payment only)
-// and library cards (for borrowing books).
-// Pull requests or additional information is very appreciated!
-typedef enum CityUIDMemberType {
-    CityUIDMemberTypeStudent,
-    CityUIDMemberTypeEmployee,
-    CityUIDMemberTypeUnknown,
-} CityUIDMemberType;
+typedef enum CityUIDCardType {
+    CityUIDCardTypeStudent,
+    CityUIDCardTypeOthers,
+    CityUIDCardTypeUnknown,
+} CityUIDCardType;
 
-#define UDECARD_MEMBER_TYPE_TO_STRING(X)             \
-    ((X) == CityUIDMemberTypeStudent  ? "Student" :  \
-     (X) == CityUIDMemberTypeEmployee ? "Employee" : \
-                                        "Unknown")
+#define CITYUID_CARD_TYPE_TO_STRING(X)             \
+    ((X) == CityUIDCardTypeStudent  ? "Student" :  \
+     (X) == CityUIDCardTypeOthers   ? "Others" :   \
+                                      "Unknown")
 
 typedef enum CityUIDLoadingResult {
     CityUIDLoadingResultSuccess,
@@ -108,11 +93,12 @@ typedef enum CityUIDLoadingResult {
 typedef enum CityUIDParsingResult {
     CityUIDParsingResultSuccess = 0,
     CityUIDParsingResultErrorMagic = 1 << 0,
-    CityUIDParsingResultErrorKsnr = 1 << 1,
-    CityUIDParsingResultErrorMemberType = 1 << 2,
-    CityUIDParsingResultErrorBalance = 1 << 3,
-    CityUIDParsingResultErrorMemberNumber = 1 << 4,
-    CityUIDParsingResultErrorTransactionCount = 1 << 5
+    CityUIDParsingResultErrorCardType = 1 << 1,
+    CityUIDParsingResultErrorStudentId = 1 << 2,
+    CityUIDParsingResultErrorCardExpiry = 1 << 3,
+    CityUIDParsingResultErrorCardIssue = 1 << 4,
+    CityUIDParsingResultErrorStudentName = 1 << 5,
+    CityUIDParsingResultErrorAdmitDate = 1 << 6
 } CityUIDParsingResult;
 
 typedef struct CityUID {
@@ -123,20 +109,17 @@ typedef struct CityUID {
 
     uint8_t uid[4];
 
-    char ksnr[UDECARD_KSNR_SIZE_MAX_LENGTH + 1]; // KS-Nr. (Karten-Seriennummer)
-    CityUIDMemberType member_type; // Stundent or Employee
-    char member_number
-        [UDECARD_MEMBER_NUMBER_SIZE +
-         1]; // student number for students, employee number for employees
-    uint16_t balance;
-    uint16_t transaction_count;
+    CityUIDCardType card_type; // Student, Staff, Alumni, or Unknown
+    char student_id[CITYUID_STUDENT_ID_SIZE + 1];        // "SDXXXXXXXX#"
+    char card_expiry_date[CITYUID_CARD_EXPIRY_SIZE + 1]; // 'STA20250615'
+    char card_issue_date[CITYUID_CARD_ISSUE_SIZE + 1];   // "YYYYMMDD"
+    char student_name[CITYUID_STUDENT_NAME_TOTAL_SIZE + 1]; // Full name from blocks 12-17
+    char admit_date[CITYUID_ADMIT_DATE_SIZE + 1];        // "YYYYMMDD"
 } CityUID;
 
 CityUID* cityuid_alloc();
 void cityuid_free(CityUID* cityuid);
 CityUIDParsingResult cityuid_parse(CityUID* cityuid, MfClassicData* mfclassicdata);
-void uid_to_ksnr(char* ksnr, uint8_t* uid);
-int xor3_to_int(const uint8_t* bytes);
 
 CityUIDLoadingResult cityuid_load_from_nfc_device(CityUID* cityuid, NfcDevice* nfc_device);
 CityUIDLoadingResult cityuid_load_from_path(CityUID* cityuid, FuriString* path);

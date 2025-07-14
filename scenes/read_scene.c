@@ -91,11 +91,10 @@ void cityuid_read_scene_on_enter(void* context) {
 
     // set read targets
     app->target_manager = read_target_manager_alloc();
-    app->target_manager->head = read_target_alloc(0, app->sector_keys[0]);
-    for(int i = 1; i < 10; i++) {
-        if(i == 4 || i == 7) continue; // skip 4 and 7
-        read_target_append(app->target_manager->head, read_target_alloc(i, app->sector_keys[i]));
-    }
+    app->target_manager->head = read_target_alloc(0, app->sector_keys[0]);  // Sector 0 (Student ID)
+    read_target_append(app->target_manager->head, read_target_alloc(1, app->sector_keys[1]));  // Sector 1 (Card dates)
+    read_target_append(app->target_manager->head, read_target_alloc(3, app->sector_keys[3]));  // Sector 3 (Student name)
+    read_target_append(app->target_manager->head, read_target_alloc(7, app->sector_keys[7]));  // Sector 7 (Admit date)
 
     // create nfc device for data saving
     app->nfc_device = nfc_device_alloc();
@@ -156,7 +155,7 @@ bool cityuid_read_scene_on_event(void* context, SceneManagerEvent event) {
                 cityuid_app_error_dialog(
                     app, cityuid_loading_error_string(app->cityuid->loading_result));
             } else { // parsing error
-                cityuid_app_error_dialog(app, "Not a CityUID.");
+                cityuid_app_error_dialog(app, "Not a CityU Student Card.");
             }
             scene_manager_previous_scene(app->scene_manager);
             consumed = true;

@@ -57,7 +57,7 @@ void cityuid_detect_scene_on_enter(void* context) {
     popup_reset(app->popup);
     popup_set_header(app->popup, "Reading", 97, 15, AlignCenter, AlignTop);
     popup_set_text(
-        app->popup, "Put CityUID\nnext to\nFlipper's back", 94, 27, AlignCenter, AlignTop);
+        app->popup, "Put CityU SID\nnext to\nFlipper's back", 94, 27, AlignCenter, AlignTop);
     popup_set_icon(app->popup, 0, 8, &I_ApplyFlipperToUDE_60x50);
     view_dispatcher_switch_to_view(app->view_dispatcher, CityUIDPopupView);
 
